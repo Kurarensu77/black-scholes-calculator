@@ -88,17 +88,40 @@ export default function BlackScholesUI() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/30 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl rounded-xl overflow-hidden transition-all duration-300">
           <div className="p-6 sm:p-8">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Black-Scholes Option Pricing Calculator</h1>
             
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6">
-              <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Black-Scholes Formula (European Call):</h2>
-              <p className="text-sm text-gray-700 dark:text-gray-300 font-mono mb-2">C = S*N(d₁) - K*e<sup>-rT</sup>*N(d₂)</p>
-              <h2 className="font-semibold text-gray-800 dark:text-gray-200 mt-4 mb-2">Put-Call Parity:</h2>
-              <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">C - P = S - K*e<sup>-rT</sup></p>
+            <div className="bg-white/50 dark:bg-gray-700/50 p-4 rounded-lg mb-6 space-y-4 backdrop-blur-sm border border-gray-100 dark:border-gray-700/50">
+              <div>
+                <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Black-Scholes Formula (European Call):</h2>
+                <p className="text-sm text-gray-700 dark:text-gray-300 font-mono mb-2">C = S*N(d₁) - K*e<sup>-rT</sup>*N(d₂)</p>
+              </div>
+              
+              <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+                <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Where:</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">d₂ = d₁ - σ√T</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">S = Current stock price</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">K = Strike price</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">r = Risk-free interest rate</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">σ = Volatility</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">T = Time to expiration (years)</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">N() = Standard normal CDF</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+                <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Put-Call Parity:</h2>
+                <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">C - P = S - K*e<sup>-rT</sup></p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -142,17 +165,17 @@ export default function BlackScholesUI() {
 
             <button
               onClick={handleCalculate}
-              className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors hover:shadow-md transform hover:-translate-y-0.5"
             >
               Calculate
             </button>
 
             {result && (
-              <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+              <div className="mt-8 border-t border-gray-200 dark:border-gray-700/50 pt-6">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Results</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(result).map(([key, value]) => (
-                    <div key={key} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                    <div key={key} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
                       <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         {key}
                       </div>
@@ -163,7 +186,7 @@ export default function BlackScholesUI() {
                   ))}
                 </div>
                 
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700/50">
                   <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Put-Call Parity Verification</h3>
                   <div className="space-y-2">
                     {parityResult && (
@@ -189,7 +212,7 @@ export default function BlackScholesUI() {
           </div>
         </div>
         
-        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           <p>Black-Scholes Option Pricing Model</p>
         </div>
       </div>
