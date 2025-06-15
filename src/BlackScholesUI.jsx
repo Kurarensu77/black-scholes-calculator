@@ -16,29 +16,35 @@ export default function BlackScholesUI() {
 
   // Check for saved theme preference or use system preference
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        setDarkMode(savedTheme === 'dark');
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (typeof window === 'undefined') return;
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
         setDarkMode(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        setDarkMode(false);
       }
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // Use system preference if no saved preference
+      document.documentElement.classList.add('dark');
+      setDarkMode(true);
     }
   }, []);
 
-  // Update the HTML class when darkMode changes
-  useEffect(() => {
-    if (darkMode) {
+  const toggleTheme = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    if (newDarkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
-  }, [darkMode]);
-
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
   };
 
   function normCDF(x) {
@@ -115,14 +121,18 @@ export default function BlackScholesUI() {
     }
   };
 
+  const handleInputChange = (key, value) => {
+    setInputs({ ...inputs, [key]: value });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/30 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Black-Scholes Option Pricing Calculator</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Black-Scholes Option Pricing</h1>
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full bg-white/70 dark:bg-slate-700/70 backdrop-blur-sm border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-sm"
             aria-label="Toggle theme"
           >
             {darkMode ? (
@@ -137,77 +147,69 @@ export default function BlackScholesUI() {
           </button>
         </div>
         
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl rounded-xl overflow-hidden transition-all duration-300">
+        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-xl rounded-xl overflow-hidden transition-all duration-300 border border-slate-200/50 dark:border-slate-700/50">
           <div className="p-6 sm:p-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Black-Scholes Option Pricing Calculator</h1>
-            
-            <div className="bg-white/50 dark:bg-gray-700/50 p-4 rounded-lg mb-6 space-y-4 backdrop-blur-sm border border-gray-100 dark:border-gray-700/50">
+            <div className="bg-white/60 dark:bg-slate-700/60 p-4 rounded-lg mb-6 space-y-4 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50">
               <div>
-                <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Black-Scholes Formula (European Call):</h2>
-                <p className="text-sm text-gray-700 dark:text-gray-300 font-mono mb-2">C = S*N(d₁) - K*e<sup>-rT</sup>*N(d₂)</p>
+                <h2 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Black-Scholes Formula (European Call):</h2>
+                <p className="text-sm text-slate-700 dark:text-slate-300 font-mono mb-2">C = S*N(d₁) - K*e<sup>-rT</sup>*N(d₂)</p>
               </div>
               
-              <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
-                <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Where:</h3>
+              <div className="border-t border-slate-200/50 dark:border-slate-700/50 pt-4">
+                <h3 className="font-medium text-slate-800 dark:text-slate-200 mb-2">Where:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">d₂ = d₁ - σ√T</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-300 font-mono">d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-300 font-mono">d₂ = d₁ - σ√T</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-gray-600 dark:text-gray-400">S = Current stock price</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">K = Strike price</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">r = Risk-free interest rate</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">σ = Volatility</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">T = Time to expiration (years)</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">N() = Standard normal CDF</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">S = Current stock price</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">K = Strike price</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">r = Risk-free interest rate</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">σ = Volatility</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">T = Time to expiration (years)</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">N() = Standard normal CDF</p>
                   </div>
                 </div>
               </div>
               
-              <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
-                <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Put-Call Parity:</h2>
-                <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">C - P = S - K*e<sup>-rT</sup></p>
+              <div className="border-t border-slate-200/50 dark:border-slate-700/50 pt-4">
+                <h2 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Put-Call Parity:</h2>
+                <p className="text-sm text-slate-700 dark:text-slate-300 font-mono">C - P = S - K*e<sup>-rT</sup></p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {Object.entries({
-                S: { label: "Spot Price (S)", unit: "$", step: "0.01" },
-                K: { label: "Strike Price (K)", unit: "$", step: "0.01" },
-                T: { label: "Time to Maturity (T)", unit: "years", step: "0.01" },
-                r: { label: "Risk-Free Rate (r)", unit: "%", step: "0.0001" },
-                sigma: { label: "Volatility (σ)", unit: "%", step: "0.0001" },
-              }).map(([key, { label, unit, step }]) => (
+              {Object.entries(inputs).map(([key, value]) => (
                 <div key={key} className="space-y-1">
-                  <label htmlFor={key} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {label} <span className="text-xs text-gray-500">({unit})</span>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {key === 'S' ? 'Stock Price (S)' : 
+                     key === 'K' ? 'Strike Price (K)' : 
+                     key === 'T' ? 'Time to Expiry (T)' : 
+                     key === 'r' ? 'Risk-free Rate (r)' : 
+                     key === 'sigma' ? 'Volatility (σ)' : 
+                     'Option Type'}
                   </label>
-                  <input
-                    id={key}
-                    type="number"
-                    step={step}
-                    value={inputs[key]}
-                    onChange={e => setInputs({ ...inputs, [key]: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  />
+                  {key === 'optionType' ? (
+                    <select
+                      value={value}
+                      onChange={(e) => handleInputChange(key, e.target.value)}
+                      className="mt-1 block w-full rounded-md border-slate-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                    >
+                      <option value="call">Call Option</option>
+                      <option value="put">Put Option</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="number"
+                      step={key === 'T' ? '0.01' : '0.0001'}
+                      value={value}
+                      onChange={(e) => handleInputChange(key, e.target.value)}
+                      className="mt-1 block w-full rounded-md border-slate-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                    />
+                  )}
                 </div>
               ))}
-              
-              <div className="space-y-1">
-                <label htmlFor="optionType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Option Type
-                </label>
-                <select
-                  id="optionType"
-                  value={inputs.optionType}
-                  onChange={e => setInputs({ ...inputs, optionType: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                >
-                  <option value="call">Call Option</option>
-                  <option value="put">Put Option</option>
-                </select>
-              </div>
             </div>
 
             <button
@@ -218,38 +220,34 @@ export default function BlackScholesUI() {
             </button>
 
             {result && (
-              <div className="mt-8 border-t border-gray-200 dark:border-gray-700/50 pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Results</h2>
+              <div className="mt-8 border-t border-slate-200/50 dark:border-slate-700/50 pt-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Results</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(result).map(([key, value]) => (
-                    <div key={key} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
-                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <div key={key} className="bg-slate-50/50 dark:bg-slate-700/50 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         {key}
                       </div>
-                      <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                      <div className="text-lg font-semibold text-slate-900 dark:text-white">
                         {typeof value === 'number' ? value.toFixed(4) : value}
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700/50">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Put-Call Parity Verification</h3>
+                <div className="mt-6 pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
+                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Put-Call Parity Verification</h3>
                   <div className="space-y-2">
                     {parityResult && (
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{parityResult.label}:</span>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {parityResult.value.toFixed(4)}
-                        </span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{parityResult.label}:</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">{parityResult.value.toFixed(4)}</span>
                       </div>
                     )}
                     {oppositeResult && (
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{oppositeResult.label}:</span>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {oppositeResult.value.toFixed(4)}
-                        </span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{oppositeResult.label}:</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">{oppositeResult.value.toFixed(4)}</span>
                       </div>
                     )}
                   </div>
@@ -259,7 +257,7 @@ export default function BlackScholesUI() {
           </div>
         </div>
         
-        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
           <p>Black-Scholes Option Pricing Model</p>
         </div>
       </div>
