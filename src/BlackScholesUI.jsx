@@ -1,8 +1,4 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 export default function BlackScholesUI() {
   const [inputs, setInputs] = useState({
@@ -92,59 +88,111 @@ export default function BlackScholesUI() {
   };
 
   return (
-    <div className="px-4 sm:px-0">
-      <Card className="w-full max-w-xl mx-auto p-4 sm:p-6">
-        <CardContent className="space-y-4">
-          <div className="text-sm text-gray-700">
-            <p><strong>Black-Scholes Formula (European Call):</strong></p>
-            <p>C = S*N(d₁) - K*e<sup>-rT</sup>*N(d₂)</p>
-            <p><strong>Put-Call Parity:</strong></p>
-            <p>C - P = S - K*e<sup>-rT</sup></p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Object.entries({
-              S: "Spot Price (S) [$]",
-              K: "Strike Price (K) [$]",
-              T: "Time to Maturity (T) [years]",
-              r: "Risk-Free Rate (r) [% as decimal]",
-              sigma: "Volatility (σ) [% as decimal]",
-            }).map(([key, label]) => (
-              <div key={key}>
-                <Label>{label}</Label>
-                <Input type="number" value={inputs[key]} onChange={e => setInputs({ ...inputs, [key]: e.target.value })} />
-              </div>
-            ))}
-            <div>
-              <Label>Option Type</Label>
-              <select
-                value={inputs.optionType}
-                onChange={e => setInputs({ ...inputs, optionType: e.target.value })}
-                className="w-full border p-2 rounded"
-              >
-                <option value="call">Call</option>
-                <option value="put">Put</option>
-              </select>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-8">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Black-Scholes Option Pricing Calculator</h1>
+            
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6">
+              <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Black-Scholes Formula (European Call):</h2>
+              <p className="text-sm text-gray-700 dark:text-gray-300 font-mono mb-2">C = S*N(d₁) - K*e<sup>-rT</sup>*N(d₂)</p>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-200 mt-4 mb-2">Put-Call Parity:</h2>
+              <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">C - P = S - K*e<sup>-rT</sup></p>
             </div>
-          </div>
 
-          <Button onClick={handleCalculate}>Calculate</Button>
-
-          {result && (
-            <div className="pt-4 space-y-1 text-sm">
-              {Object.entries(result).map(([k, v]) => (
-                <div key={k}><strong>{k}:</strong> {v.toFixed(4)}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {Object.entries({
+                S: { label: "Spot Price (S)", unit: "$", step: "0.01" },
+                K: { label: "Strike Price (K)", unit: "$", step: "0.01" },
+                T: { label: "Time to Maturity (T)", unit: "years", step: "0.01" },
+                r: { label: "Risk-Free Rate (r)", unit: "%", step: "0.0001" },
+                sigma: { label: "Volatility (σ)", unit: "%", step: "0.0001" },
+              }).map(([key, { label, unit, step }]) => (
+                <div key={key} className="space-y-1">
+                  <label htmlFor={key} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {label} <span className="text-xs text-gray-500">({unit})</span>
+                  </label>
+                  <input
+                    id={key}
+                    type="number"
+                    step={step}
+                    value={inputs[key]}
+                    onChange={e => setInputs({ ...inputs, [key]: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  />
+                </div>
               ))}
-              {parityResult && (
-                <div><strong>{parityResult.label}:</strong> {parityResult.value.toFixed(4)}</div>
-              )}
-              {oppositeResult && (
-                <div><strong>{oppositeResult.label}:</strong> {oppositeResult.value.toFixed(4)}</div>
-              )}
+              
+              <div className="space-y-1">
+                <label htmlFor="optionType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Option Type
+                </label>
+                <select
+                  id="optionType"
+                  value={inputs.optionType}
+                  onChange={e => setInputs({ ...inputs, optionType: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                >
+                  <option value="call">Call Option</option>
+                  <option value="put">Put Option</option>
+                </select>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+
+            <button
+              onClick={handleCalculate}
+              className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              Calculate
+            </button>
+
+            {result && (
+              <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Results</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(result).map(([key, value]) => (
+                    <div key={key} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {key}
+                      </div>
+                      <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                        {typeof value === 'number' ? value.toFixed(4) : value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Put-Call Parity Verification</h3>
+                  <div className="space-y-2">
+                    {parityResult && (
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{parityResult.label}:</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {parityResult.value.toFixed(4)}
+                        </span>
+                      </div>
+                    )}
+                    {oppositeResult && (
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{oppositeResult.label}:</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {oppositeResult.value.toFixed(4)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p>Black-Scholes Option Pricing Model</p>
+        </div>
+      </div>
     </div>
   );
 }
