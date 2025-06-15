@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function BlackScholesUI() {
   const [inputs, setInputs] = useState({
@@ -12,6 +12,34 @@ export default function BlackScholesUI() {
   const [result, setResult] = useState(null);
   const [parityResult, setParityResult] = useState(null);
   const [oppositeResult, setOppositeResult] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Check for saved theme preference or use system preference
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        setDarkMode(savedTheme === 'dark');
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setDarkMode(true);
+      }
+    }
+  }, []);
+
+  // Update the HTML class when darkMode changes
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+  };
 
   function normCDF(x) {
     const sign = x < 0 ? -1 : 1;
@@ -88,8 +116,27 @@ export default function BlackScholesUI() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/30 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/30 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Black-Scholes Option Pricing Calculator</h1>
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Toggle theme"
+          >
+            {darkMode ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-4 6a1 1 0 100 2h1a1 1 0 100-2h-1z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            )}
+          </button>
+        </div>
+        
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl rounded-xl overflow-hidden transition-all duration-300">
           <div className="p-6 sm:p-8">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Black-Scholes Option Pricing Calculator</h1>
